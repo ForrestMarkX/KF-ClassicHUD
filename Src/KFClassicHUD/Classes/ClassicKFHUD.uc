@@ -207,9 +207,7 @@ struct XPEarnedS
     var Texture2D Icon;
     var Color IconColor;
 };
-const XPEARNED_COUNT = 32;
-var XPEarnedS XPPopups[XPEARNED_COUNT];
-var int NextXPPopupIndex;
+var array<XPEarnedS> XPPopups;
 var float XPFadeOutTime;
 
 struct DoshEarnedS
@@ -218,9 +216,7 @@ struct DoshEarnedS
     var bool bInit;
     var int Dosh;
 };
-const DOSHEARNED_COUNT = 32;
-var DoshEarnedS DoshPopups[XPEARNED_COUNT];
-var int NextDoshPopupIndex;
+var array<DoshEarnedS> DoshPopups;
 var float DoshFadeOutTime;
 
 var array<KFPawn_Human> PawnList;
@@ -436,7 +432,9 @@ function PostRender()
     }
     GUIStyle.Canvas = Canvas;
     GUIStyle.PickDefaultFontSize(Canvas.ClipY);
-    GUIController.HandleDrawMenu();
+    
+    if( !GUIController.bIsInMenuState )
+        GUIController.HandleDrawMenu();
     
     ScaledBorderSize = FMax(GUIStyle.ScreenScale(HUDBorderSize), 1.f);
     
@@ -1087,10 +1085,10 @@ function DrawHUDBox
 
 function RenderKFHUD(KFPawn_Human KFPH)
 {
-    local float scale_w, scale_w2, FontScalar, OriginalFontScalar, XL, YL, ObjYL, BoxXL, BoxYL, BoxSW, BoxSH, DoshXL, DoshYL, PerkXL, PerkYL, StarXL, StarYL, ObjectiveH, SecondaryXL, SecondaryYL;
+    local float scale_w, scale_w2, FontScalar, OriginalFontScalar, XL, YL, ObjYL, BoxXL, BoxYL, BoxSW, BoxSH, DoshXL, DoshYL, PerkXL, PerkYL, StarXL, StarYL, ObjectiveH, SecondaryXL, SecondaryYL, PerkLevelXL, PerkLevelYL, PerkIconY;
     local float PerkProgressSize, PerkProgressX, PerkProgressY;
     local byte PerkLevel;
-    local int i, XPos, YPos, DrawCircleSize, FlashlightCharge, AmmoCount, MagCount, StarCount, CurrentScore, Index, ObjectiveSize, ObjectivePadding, ObjX, ObjY, bStatusWarning, bStatusNotification, PrestigeLevel;
+    local int i, XPos, YPos, DrawCircleSize, FlashlightCharge, AmmoCount, MagCount, CurrentScore, Index, ObjectiveSize, ObjectivePadding, ObjX, ObjY, bStatusWarning, bStatusNotification, PrestigeLevel;
     local string CircleText, SubCircleText, WeaponName, TraderDistanceText, ObjectiveTitle, ObjectiveDesc, ObjectiveProgress, ObjectiveReward, ObjectiveStatusMessage;
     local bool bSingleFire, bHasSecondaryAmmo;
     local Texture2D PerkIcon;
@@ -1100,7 +1098,7 @@ function RenderKFHUD(KFPawn_Human KFPH)
     local KFTraderTrigger T;
     local KFGFxObject_TraderItems TraderItems;
     local FontRenderInfo FRI;
-    local Color HealthFontColor;
+    local Color HealthFontColor, PerkStarColor;
     local HUDBoxRenderInfo HBRI;
     local KFInterface_MapObjective MapObjective;
     
@@ -1259,13 +1257,12 @@ function RenderKFHUD(KFPawn_Human KFPH)
         Canvas.DrawColor = FontColor;
         GUIStyle.DrawTextShadow(PlayerScore, DoshXL + (DoshXL * 0.035), DoshYL + (scale_w / 2) - (YL / 2), 1, FontScalar);
         
-        DrawDoshEarned((DoshXL + (DoshXL * 0.035)) + ((scale_w-XL) / 2), DoshYL);
+        if( DoshPopups.Length > 0 )
+            DrawDoshEarned((DoshXL + (DoshXL * 0.035)) + ((scale_w-XL) / 2), DoshYL);
         
         // Draw Perk Info
         if( MyKFPRI.CurrentPerkClass != None )
         {
-            FontScalar = OriginalFontScalar + GUIStyle.ScreenScale(0.15);
-            
             PrestigeLevel = MyKFPRI.GetActivePerkPrestigeLevel();
             PerkLevel = MyKFPRI.GetActivePerkLevel();
             PerkIcon = MyKFPRI.CurrentPerkClass.default.PerkIcon;
@@ -1274,71 +1271,76 @@ function RenderKFHUD(KFPawn_Human KFPH)
             PerkXL = SizeX - (SizeX - 12);
             PerkYL = SizeY * 0.8625;
             
+            Canvas.TextSize(PerkLevel@MyKFPRI.CurrentPerkClass.default.PerkName, XL, YL, OriginalFontScalar, OriginalFontScalar);
+            
+            PerkLevelXL = PerkXL + scale_w + (ScaledBorderSize*2);
+            PerkLevelYL = PerkYL + (scale_w - YL) + (ScaledBorderSize*2);
+            PerkIconY = PerkYL;
+            
+            Canvas.DrawColor = FontColor;
+            GUIStyle.DrawTextShadow(PerkLevel@MyKFPRI.CurrentPerkClass.default.PerkName, PerkLevelXL, PerkLevelYL, 1, OriginalFontScalar);
+            
             if( PrestigeLevel > 0 )
             {
                 Canvas.DrawColor = PlayerBarShadowColor;
-                Canvas.SetPos(PerkXL+1, PerkYL+1);
+                Canvas.SetPos(PerkXL+1, PerkIconY+1);
                 Canvas.DrawTile(MyKFPRI.CurrentPerkClass.default.PrestigeIcons[PrestigeLevel - 1], scale_w, scale_w, 0, 3, 256, 256);
                 
                 Canvas.DrawColor = WhiteColor;
-                Canvas.SetPos(PerkXL, PerkYL);
+                Canvas.SetPos(PerkXL, PerkIconY);
                 Canvas.DrawTile(MyKFPRI.CurrentPerkClass.default.PrestigeIcons[PrestigeLevel - 1], scale_w, scale_w, 0, 3, 256, 256);
             }
             
             if (PrestigeLevel > 0)
-            {			
+            {
                 Canvas.DrawColor = WhiteColor;
-                Canvas.SetPos(PerkXL + ((scale_w/2) - ((scale_w*PrestigeIconScale)/2)), PerkYL + ((scale_w/2) - ((scale_w*PrestigeIconScale)/2)) - 4);
+                Canvas.SetPos(PerkXL + ((scale_w/2) - ((scale_w*PrestigeIconScale)/2)), PerkIconY + ((scale_w/2) - ((scale_w*PrestigeIconScale)/2)) - 4);
                 Canvas.DrawRect(scale_w*PrestigeIconScale, scale_w*PrestigeIconScale, PerkIcon);
             }
             else
             {
                 Canvas.DrawColor = PlayerBarShadowColor;
-                Canvas.SetPos(PerkXL+1, PerkYL+1);
+                Canvas.SetPos(PerkXL+1, PerkIconY+1);
                 Canvas.DrawRect(scale_w, scale_w, PerkIcon);
                 
                 Canvas.DrawColor = WhiteColor;
-                Canvas.SetPos(PerkXL, PerkYL);
+                Canvas.SetPos(PerkXL, PerkIconY);
                 Canvas.DrawRect(scale_w, scale_w, PerkIcon);
             }
             
             //Perk Stars
-            if( PerkLevel > 0 )
+            if( PrestigeLevel > 0 )
             {
-                StarCount = 0;
                 PerkIconSize = GUIStyle.ScreenScale(default.PerkIconSize);
-                StarXL = PerkXL + scale_w;
+                StarXL = PerkLevelXL + PerkIconSize;
+                StarYL = PerkLevelYL - PerkIconSize;
                 
-                for ( i = 0; i < PerkLevel; i++ )
+                PerkStarColor = MakeColor(255, 200 * (PrestigeLevel/`MAX_PRESTIGE_LEVEL), 15, 255);
+                for ( i = 0; i < PrestigeLevel; i++ )
                 {
-                    StarYL = (PerkYL + (scale_w - PerkIconSize)) - (StarCount * PerkIconSize);
-                    
                     Canvas.DrawColor = PlayerBarShadowColor;
                     Canvas.SetPos(StarXL+1, StarYL+1);
                     Canvas.DrawRect(PerkIconSize, PerkIconSize, PerkStarIcon);
                             
-                    Canvas.DrawColor = WhiteColor;
+                    Canvas.DrawColor = PerkStarColor;
                     Canvas.SetPos(StarXL, StarYL);
                     Canvas.DrawRect(PerkIconSize, PerkIconSize, PerkStarIcon);
                     
-                    if( ++StarCount == MaxStarsPerRow )
-                    {
-                        StarCount = 0;
-                        StarXL += PerkIconSize;
-                    }
+                    StarXL += PerkIconSize;
                 }
             }
             
             // Progress Bar
             PerkProgressSize = GUIStyle.ScreenScale(76);
             PerkProgressX = Canvas.ClipX * 0.007;
-            PerkProgressY = PerkYL - (scale_w / 2);
+            PerkProgressY = PerkIconY - (PerkProgressSize*0.125f) - ScaledBorderSize;
             Canvas.DrawColor = WhiteColor;
             
             bDisplayingProgress = true;
             LevelProgressBar = KFPlayerOwner.GetPerkLevelProgressPercentage(KFPlayerOwner.CurrentPerk.Class) / 100.f;
             DrawProgressBar(PerkProgressX,PerkProgressY-PerkProgressSize*0.12f,PerkProgressSize*2.f,PerkProgressSize*0.125f,VisualProgressBar);
-            DrawXPEarned(PerkProgressX + (PerkProgressSize/2), PerkProgressY-(PerkProgressSize*0.125f)-(ScaledBorderSize*2));
+            if( XPPopups.Length > 0 )
+                DrawXPEarned(PerkProgressX + (PerkProgressSize/2), PerkProgressY-(PerkProgressSize*0.125f)-(ScaledBorderSize*2));
         }
     }
     
@@ -3024,11 +3026,14 @@ function DrawXPEarned(float X, float Y)
 
     Canvas.Font = GUIStyle.PickFont(Sc);
     
-    for( i=0; i<XPEARNED_COUNT; i++ ) 
+    for( i=0; i<XPPopups.Length; i++ ) 
     {
         EndTime = `RealTimeSince(XPPopups[i].StartTime);
         if( EndTime > XPFadeOutTime )
+        {
+            XPPopups.RemoveItem(XPPopups[i]);
             continue;
+        }
             
         S = "+"$string(XPPopups[i].XP)@"XP";
         Canvas.TextSize(S,TextWidth,TextHeight,Sc,Sc);
@@ -3081,11 +3086,14 @@ function DrawDoshEarned(float X, float Y)
 
     Canvas.Font = GUIStyle.PickFont(Sc);
     
-    for( i=0; i<DOSHEARNED_COUNT; i++ ) 
+    for( i=0; i<DoshPopups.Length; i++ ) 
     {
         EndTime = `RealTimeSince(DoshPopups[i].StartTime);
         if( EndTime > DoshFadeOutTime )
+        {
+            DoshPopups.RemoveItem(DoshPopups[i]);
             continue;
+        }
             
         S = (DoshPopups[i].Dosh > 0 ? "+" : "")$string(DoshPopups[i].Dosh);
         Canvas.TextSize(S,TextWidth,TextHeight,Sc,Sc);
@@ -3126,28 +3134,30 @@ function DrawDoshEarned(float X, float Y)
 
 function NotifyXPEarned( int XP, Texture2D Icon, Color IconColor )
 {
-    XPPopups[NextXPPopupIndex].XP = XP;
-    XPPopups[NextXPPopupIndex].StartTime = WorldInfo.RealTimeSeconds;
-    XPPopups[NextXPPopupIndex].RandX = 2.f * FRand();
-    XPPopups[NextXPPopupIndex].RandY = 1.f + FRand();
-    XPPopups[NextXPPopupIndex].Icon = Icon;
-    XPPopups[NextXPPopupIndex].IconColor = IconColor;
-    XPPopups[NextXPPopupIndex].bInit = true;
+    local XPEarnedS XPEarned;
     
-    if( ++NextXPPopupIndex >= XPEARNED_COUNT)
-        NextXPPopupIndex=0;
+    XPEarned.XP = XP;
+    XPEarned.StartTime = WorldInfo.RealTimeSeconds;
+    XPEarned.RandX = 2.f * FRand();
+    XPEarned.RandY = 1.f + FRand();
+    XPEarned.Icon = Icon;
+    XPEarned.IconColor = IconColor;
+    XPEarned.bInit = true;
+    
+    XPPopups.AddItem(XPEarned);
 }
 
 function NotifyDoshEarned( int Dosh )
 {
-    DoshPopups[NextDoshPopupIndex].Dosh = Dosh;
-    DoshPopups[NextDoshPopupIndex].StartTime = WorldInfo.RealTimeSeconds;
-    DoshPopups[NextDoshPopupIndex].RandX = 2.f * FRand();
-    DoshPopups[NextDoshPopupIndex].RandY = 1.f + FRand();
-    DoshPopups[NextDoshPopupIndex].bInit = true;
+    local DoshEarnedS DoshEarned;
+   
+    DoshEarned.Dosh = Dosh;
+    DoshEarned.StartTime = WorldInfo.RealTimeSeconds;
+    DoshEarned.RandX = 2.f * FRand();
+    DoshEarned.RandY = 1.f + FRand();
+    DoshEarned.bInit = true;
     
-    if( ++NextDoshPopupIndex >= DOSHEARNED_COUNT)
-        NextDoshPopupIndex=0;
+    DoshPopups.AddItem(DoshEarned);
 }
 
 function DrawWeaponPickupInfo()

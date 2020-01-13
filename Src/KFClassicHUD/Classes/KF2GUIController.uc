@@ -241,7 +241,7 @@ simulated function HandleDrawMenu()
         ClientViewport.ViewportConsole = HackConsole;
         
         // Make sure nothing overrides these settings while menu is being open.
-        // PlayerOwner.PlayerInput = CustomInput;
+        if( bIsInMenuState ) PlayerOwner.PlayerInput = CustomInput;
     }
 }
 simulated function RenderMenu( Canvas C )
@@ -249,37 +249,40 @@ simulated function RenderMenu( Canvas C )
     local int i;
     local float OrgX,OrgY,ClipX,ClipY;
     
-    if( !bFinishedReplication || KFPlayerController(PlayerOwner).MyGFxManager.bMenusActive )
+    if( !bFinishedReplication )
         return;
 
     ClientViewport.ViewportConsole = OrgConsole;
 
-    ScreenSize.X = C.SizeX;
-    ScreenSize.Y = C.SizeY;
-    CurrentStyle.Canvas = C;
-    CurrentStyle.PickDefaultFontSize(C.SizeY);
-    
-    HUDOwner.Canvas = C;
-    HUDOwner.RenderKFHUD(KFPawn_Human(PlayerOwner.Pawn));
-    
     OrgX = C.OrgX;
     OrgY = C.OrgY;
     ClipX = C.ClipX;
     ClipY = C.ClipY;
     
-    for( i=(HUDOwner.HUDWidgets.Length-1); i>=0; --i )
+    ScreenSize.X = C.SizeX;
+    ScreenSize.Y = C.SizeY;
+    CurrentStyle.Canvas = C;
+    CurrentStyle.PickDefaultFontSize(C.SizeY);
+    
+    if( !KFPlayerController(PlayerOwner).MyGFxManager.bMenusActive )
     {
-        HUDOwner.HUDWidgets[i].InputPos[0] = 0.f;
-        HUDOwner.HUDWidgets[i].InputPos[1] = 0.f;
-        HUDOwner.HUDWidgets[i].InputPos[2] = ScreenSize.X;
-        HUDOwner.HUDWidgets[i].InputPos[3] = ScreenSize.Y;
-        HUDOwner.HUDWidgets[i].Canvas = C;
-        HUDOwner.HUDWidgets[i].PreDraw();
+        HUDOwner.Canvas = C;
+        HUDOwner.RenderKFHUD(KFPawn_Human(PlayerOwner.Pawn));
+        
+        for( i=(HUDOwner.HUDWidgets.Length-1); i>=0; --i )
+        {
+            HUDOwner.HUDWidgets[i].InputPos[0] = 0.f;
+            HUDOwner.HUDWidgets[i].InputPos[1] = 0.f;
+            HUDOwner.HUDWidgets[i].InputPos[2] = ScreenSize.X;
+            HUDOwner.HUDWidgets[i].InputPos[3] = ScreenSize.Y;
+            HUDOwner.HUDWidgets[i].Canvas = C;
+            HUDOwner.HUDWidgets[i].PreDraw();
+        }
+        
+        C.SetOrigin(OrgX,OrgY);
+        C.SetClip(ClipX,ClipY);
     }
     
-    C.SetOrigin(OrgX,OrgY);
-    C.SetClip(ClipX,ClipY);
-
     if( bIsInMenuState )
     {
         for( i=(ActiveMenus.Length-1); i>=0; --i )
