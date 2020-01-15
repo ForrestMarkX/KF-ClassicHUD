@@ -1163,9 +1163,7 @@ function RenderKFHUD(KFPawn_Human KFPH)
             }
         }
     }
-    
-    Canvas.Font = GUIStyle.PickFont(OriginalFontScalar);
-    
+
     if( !bShowHUD || KFPH == None )
         return;
         
@@ -1263,6 +1261,8 @@ function RenderKFHUD(KFPawn_Human KFPH)
         // Draw Perk Info
         if( MyKFPRI.CurrentPerkClass != None )
         {
+            FontScalar = OriginalFontScalar;
+            
             PrestigeLevel = MyKFPRI.GetActivePerkPrestigeLevel();
             PerkLevel = MyKFPRI.GetActivePerkLevel();
             PerkIcon = MyKFPRI.CurrentPerkClass.default.PerkIcon;
@@ -1271,14 +1271,17 @@ function RenderKFHUD(KFPawn_Human KFPH)
             PerkXL = SizeX - (SizeX - 12);
             PerkYL = SizeY * 0.8625;
             
-            Canvas.TextSize(PerkLevel@MyKFPRI.CurrentPerkClass.default.PerkName, XL, YL, OriginalFontScalar, OriginalFontScalar);
+            Canvas.Font = GUIStyle.PickFont(OriginalFontScalar);
+            Canvas.TextSize(PerkLevel@MyKFPRI.CurrentPerkClass.default.PerkName, XL, YL, FontScalar, FontScalar);
             
             PerkLevelXL = PerkXL + scale_w + (ScaledBorderSize*2);
             PerkLevelYL = PerkYL + (scale_w - YL) + (ScaledBorderSize*2);
             PerkIconY = PerkYL;
             
             Canvas.DrawColor = FontColor;
-            GUIStyle.DrawTextShadow(PerkLevel@MyKFPRI.CurrentPerkClass.default.PerkName, PerkLevelXL, PerkLevelYL, 1, OriginalFontScalar);
+            GUIStyle.DrawTextShadow(PerkLevel@MyKFPRI.CurrentPerkClass.default.PerkName, PerkLevelXL, PerkLevelYL, 1, FontScalar);
+            
+            Canvas.Font = GUIStyle.PickFont(OriginalFontScalar, true);
             
             if( PrestigeLevel > 0 )
             {
@@ -1352,6 +1355,8 @@ function RenderKFHUD(KFPawn_Human KFPH)
             T = KFGRI.OpenedTrader != None ? KFGRI.OpenedTrader : KFGRI.NextTrader;
             if( T != None )
             {
+                Canvas.Font = GUIStyle.PickFont(OriginalFontScalar);
+                
                 FontScalar = OriginalFontScalar + GUIStyle.ScreenScale(0.3);
                 
                 TraderDistanceText = "Trader"$": "$int(VSize(T.Location - KFPH.Location) / 100.f)$"m";
@@ -1359,6 +1364,8 @@ function RenderKFHUD(KFPawn_Human KFPH)
                 
                 Canvas.DrawColor = FontColor;
                 GUIStyle.DrawTextShadow(TraderDistanceText, Canvas.ClipX*0.015, YL, 1, FontScalar);
+                
+                Canvas.Font = GUIStyle.PickFont(OriginalFontScalar, true);
             }
         }
         
@@ -1369,6 +1376,7 @@ function RenderKFHUD(KFPawn_Human KFPH)
             
         if( MapObjective != None && (MapObjective.IsActive() || ((MapObjective.IsComplete() || MapObjective.HasFailedObjective()) && KFGRI.bWaveIsActive)) )
         {
+            Canvas.Font = GUIStyle.PickFont(OriginalFontScalar);
             FontScalar = OriginalFontScalar + GUIStyle.ScreenScale(0.155);
             
             ObjectivePadding = GUIStyle.ScreenScale(8);
@@ -1464,6 +1472,7 @@ function RenderKFHUD(KFPawn_Human KFPH)
                 Canvas.SetPos(XPos, YPos);
                 Canvas.DrawText(ObjectiveStatusMessage,, FontScalar, FontScalar, FRI);
             }
+            Canvas.Font = GUIStyle.PickFont(OriginalFontScalar, true);
         }
     }
     
@@ -1494,16 +1503,11 @@ function RenderKFHUD(KFPawn_Human KFPH)
             CachedWeaponInfo.Weapon = CurrentWeapon;
             CachedWeaponInfo.WeaponName = WeaponName;
         }
-        else
-        {
-            WeaponName = CachedWeaponInfo.WeaponName;
-        }
+        else WeaponName = CachedWeaponInfo.WeaponName;
         
         Canvas.TextSize(WeaponName, XL, YL, FontScalar, FontScalar);
         Canvas.DrawColor = FontColor;
         GUIStyle.DrawTextShadow(WeaponName, (SizeX * 0.95f) - XL, SizeY * 0.892f, 1, FontScalar);
-        
-        Canvas.Font = GUIStyle.PickFont(OriginalFontScalar,true);
         
         BoxXL = SizeX * 0.915;
         FontScalar = OriginalFontScalar + GUIStyle.ScreenScale(0.3);
@@ -1578,9 +1582,7 @@ function RenderKFHUD(KFPawn_Human KFPH)
     
     // Inventory
     if ( bDisplayInventory )
-    {
         DrawInventory();
-    }
 }
 
 function RefreshInventory()
