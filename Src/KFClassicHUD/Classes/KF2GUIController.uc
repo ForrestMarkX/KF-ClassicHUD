@@ -987,7 +987,7 @@ defaultproperties
     CurrentCursorIndex=`CURSOR_DEFAULT
     
     DefaultStyle=class'ClassicStyle'
-    bAbsorbInput=false
+    bAbsorbInput=true
     bAlwaysTick=true
     bHideCursor=true
 }
