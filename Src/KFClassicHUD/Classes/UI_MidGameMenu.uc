@@ -59,8 +59,14 @@ function ShowMenu()
 
 function CloseMenu()
 {
+    local KFGfxMoviePlayer_Manager MovieManager;
+    
     Super.CloseMenu();
+    
     Owner.bHideCursor = true;
+    
+    MovieManager = KFPlayerController(GetPlayer()).MyGFxManager;
+    MovieManager.SetMovieCanReceiveInput(MovieManager.bMenusActive);
 }
 
 function PreDraw()

@@ -1,24 +1,31 @@
 Class UIP_ColorSettings extends KFGUI_MultiComponent;
 
 var KFGUI_ComponentList SettingsBox;
-var KFGUI_ColorSlider MainHudSlider,OutlineSlider,FontSlider;
+var KFGUI_ColorSlider MainHudSlider,OutlineSlider,FontSlider,ArmorSlider,HealthSlider;
+var ClassicKFHUD HUD;
 
 function InitMenu()
 {
+    HUD = ClassicKFHUD(GetPlayer().myHUD);
+    
     Super.InitMenu();
 
     // Client settings
     SettingsBox = KFGUI_ComponentList(FindComponentID('SettingsBox'));
 
-    MainHudSlider = AddColorSlider('HUDColorSlider', "Main HUD Color", ClassicKFHUD(GetPlayer().myHUD).HudMainColor);
-    OutlineSlider = AddColorSlider('OutlineColorSlider', "HUD Outline Color", ClassicKFHUD(GetPlayer().myHUD).HudOutlineColor);
-    FontSlider = AddColorSlider('FontCSlider', "Font Color", ClassicKFHUD(GetPlayer().myHUD).FontColor);
+    MainHudSlider = AddColorSlider('HUDColorSlider', "Main HUD Color", HUD.HudMainColor);
+    OutlineSlider = AddColorSlider('OutlineColorSlider', "HUD Outline Color", HUD.HudOutlineColor);
+    FontSlider = AddColorSlider('FontCSlider', "Font Color", HUD.FontColor);
+    ArmorSlider = AddColorSlider('ArmorCSlider', "Player Info Armor Color", HUD.CustomArmorColor);
+    HealthSlider = AddColorSlider('HealthCSlider', "Player Info Health Color", HUD.CustomHealthColor);
 }
 
 function ShowMenu()
 {
     Super.ShowMenu();
-    ClassicKFHUD(GetPlayer().myHUD).ColorSettingMenu = self;
+    HUD.ColorSettingMenu = self;
+    ArmorSlider.SetDefaultColor(HUD.CustomArmorColor);
+    HealthSlider.SetDefaultColor(HUD.CustomHealthColor);
 }
 
 final function KFGUI_ColorSlider AddColorSlider( name IDN, string Caption, Color DefaultColor )
@@ -42,12 +49,6 @@ final function KFGUI_ColorSlider AddColorSlider( name IDN, string Caption, Color
 
 function CheckColorSliderChange(KFGUI_ColorSlider Sender, KFGUI_Slider Slider, int Value)
 {
-    local ClassicKFHUD HUD;
-    
-    HUD = ClassicKFHUD(GetPlayer().myHUD);
-    if( HUD == None )
-        return;
-    
     switch(Sender.ID)
     {
         case 'HUDColorSlider':
@@ -104,23 +105,48 @@ function CheckColorSliderChange(KFGUI_ColorSlider Sender, KFGUI_Slider Slider, i
             }
             HUD.SaveConfig();
             break;
+        case 'ArmorCSlider':
+            switch( Slider.ID )
+            {
+                case 'ColorSliderR':
+                    HUD.CustomArmorColor.R = Value;
+                    break;
+                case 'ColorSliderG':
+                    HUD.CustomArmorColor.G = Value;
+                    break;
+                case 'ColorSliderB':
+                    HUD.CustomArmorColor.B = Value;
+                    break;
+                case 'ColorSliderA':
+                    HUD.CustomArmorColor.A = Value;
+                    break;
+            }
+            HUD.SaveConfig();
+            break;
+        case 'HealthCSlider':
+            switch( Slider.ID )
+            {
+                case 'ColorSliderR':
+                    HUD.CustomHealthColor.R = Value;
+                    break;
+                case 'ColorSliderG':
+                    HUD.CustomHealthColor.G = Value;
+                    break;
+                case 'ColorSliderB':
+                    HUD.CustomHealthColor.B = Value;
+                    break;
+                case 'ColorSliderA':
+                    HUD.CustomHealthColor.A = Value;
+                    break;
+            }
+            HUD.SaveConfig();
+            break;
     }
-}
-
-function DrawMenu()
-{
-    Canvas.SetDrawColor(250,250,250,255);
-    Canvas.SetPos(0.f,0.f);
-    Canvas.DrawTileStretched(Owner.CurrentStyle.BorderTextures[`BOX_INNERBORDER],CompPos[2],CompPos[3],0,0,128,128);
 }
 
 defaultproperties
 {
     Begin Object Class=KFGUI_ComponentList Name=ClientSettingsBox
-        XPosition=0.05
-        YPosition=0.05
-        XSize=0.95
-        YSize=0.95
         ID="SettingsBox"
         ListItemsPerPage=3
     End Object

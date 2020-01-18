@@ -140,6 +140,22 @@ function OnComboChanged(KFGUI_ComboBox Sender)
         break;
     }
     
+    switch(HUD.PlayerInfoType)
+    {
+        case INFO_CLASSIC:
+            HUD.CustomArmorColor = HUD.BlueColor;
+            HUD.CustomHealthColor = HUD.RedColor;
+            break;
+        case INFO_LEGACY:
+            HUD.CustomArmorColor = HUD.ClassicArmorColor;
+            HUD.CustomHealthColor = HUD.ClassicHealthColor;
+            break;
+        case INFO_MODERN:
+            HUD.CustomArmorColor = HUD.ArmorColor;
+            HUD.CustomHealthColor = HUD.HealthColor;
+            break;    
+    }
+    
     HUD.SaveConfig();
 }
 

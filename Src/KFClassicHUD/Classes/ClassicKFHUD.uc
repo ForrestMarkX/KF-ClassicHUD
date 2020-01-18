@@ -1,6 +1,8 @@
 class ClassicKFHUD extends KFGFxHudWrapper
     config(ClassicHUD);
 
+const GFxListenerPriority = 80000;
+    
 const MAX_WEAPON_GROUPS = 4;
 const HUDBorderSize = 3;
 
@@ -272,8 +274,10 @@ var transient bool bLoadedInitItems;
 var array<Color> DamageMsgColors;
 
 var UIP_ColorSettings ColorSettingMenu;
+var transient GFxClikWidget HUDChatInputField, PartyChatInputField;
+var transient bool bReplicatedColorTextures;
 
-var config Color HudMainColor, HudOutlineColor, FontColor;
+var config Color HudMainColor, HudOutlineColor, FontColor, CustomArmorColor, CustomHealthColor;
 var config bool bEnableDamagePopups, bLightHUD, bHideWeaponInfo, bHidePlayerInfo, bHideDosh, bDisableHiddenPlayers, bShowSpeed, bDisableLastZEDIcons, bDisablePickupInfo, bDisableLockOnUI, bDisableRechargeUI, bShowXPEarned, bShowDoshEarned, bNewScoreboard, bDisableHUD;
 var config int HealthBarFullVisDist, HealthBarCutoffDist;
 var config int iConfigVersion;
@@ -320,6 +324,28 @@ simulated function PostBeginPlay()
         bSaveConfig = true;
     }
     
+    if( iConfigVersion <= 1 )
+    {
+        switch(PlayerInfoType)
+        {
+            case INFO_CLASSIC:
+                CustomArmorColor = BlueColor;
+                CustomHealthColor = RedColor;
+                break;
+            case INFO_LEGACY:
+                CustomArmorColor = ClassicArmorColor;
+                CustomHealthColor = ClassicHealthColor;
+                break;
+            case INFO_MODERN:
+                CustomArmorColor = ArmorColor;
+                CustomHealthColor = HealthColor;
+                break;    
+        }
+        
+        iConfigVersion++;
+        bSaveConfig = true;
+    }
+    
     if( bSaveConfig )
         SaveConfig();
     
@@ -348,6 +374,97 @@ simulated function PostBeginPlay()
         HUDClass = class'KFGFxHudWrapper'.default.HUDClass;
         CreateHUDMovie();
     }
+    
+    SetTimer(0.25f, false, nameof(InitializeHUD));
+    
+    InitializePartyChatHook();
+    InitializeHUDChatHook();
+}
+
+function InitializeHUD()
+{
+    WriteToChat("<Classic HUD> Initialized!", "FFFF00");
+    WriteToChat("<Classic HUD> Type !settings or use OpenSettingsMenu in console to configure!", "00FF00");
+}
+
+delegate OnPartyChatInputKeyDown(GFxClikWidget.EventData Data)
+{
+    OnChatKeyDown(PartyChatInputField, Data);
+}
+
+delegate OnHUDChatInputKeyDown(GFxClikWidget.EventData Data)
+{
+    if (OnChatKeyDown(HUDChatInputField, Data))
+        HUDMovie.HudChatBox.ClearAndCloseChat();
+}
+
+function bool OnChatKeyDown(GFxClikWidget InputField, GFxClikWidget.EventData Data)
+{
+    local GFXObject InputDetails;
+    local int KeyCode;
+    local string EventType;
+    local string KeyEvent;
+    local string Text;
+
+    InputDetails = Data._this.GetObject("details");
+    KeyCode = InputDetails.GetInt("code");
+    EventType = InputDetails.GetString("type");
+    KeyEvent = InputDetails.GetString("value");
+
+    if (EventType != "key") return false;
+
+    if (KeyCode == 13 && (KeyEvent == "keyHold" || KeyEvent == "keyDown"))
+    {
+        Text = InputField.GetText();
+        switch (Locs(Text))
+        {
+            case "!settings":
+                OpenSettingsMenu();
+                break;
+            default:
+                return false;
+        }
+
+        InputField.SetText("");
+
+        return true;
+    }
+
+    return false;
+}
+
+function InitializePartyChatHook()
+{
+    if (KFPlayerOwner.MyGFxManager == None || KFPlayerOwner.MyGFxManager.PartyWidget == None || KFPlayerOwner.MYGFxManager.PartyWidget.PartyChatWidget == None)
+    {
+        SetTimer(1.f, false, nameof(InitializePartyChatHook));
+        return;
+    }
+
+    KFPlayerOwner.MyGFxManager.PartyWidget.PartyChatWidget.SetVisible(true);
+    PartyChatInputField = GFxClikWidget(KFPlayerOwner.MyGFxManager.PartyWidget.PartyChatWidget.GetObject("ChatInputField", class'GFxClikWidget'));
+    PartyChatInputField.AddEventListener('CLIK_input', OnPartyChatInputKeyDown, false, GFxListenerPriority, false);
+}
+
+function InitializeHUDChatHook()
+{
+    if( HUDMovie == None || HUDMovie.HudChatBox == None )
+    {
+        SetTimer(1.f, false, nameof(InitializeHUDChatHook));
+        return;
+    }
+
+    HUDChatInputField = GFxClikWidget(HUDMovie.HudChatBox.GetObject("ChatInputField", class'GFxClikWidget'));
+    HUDChatInputField.AddEventListener('CLIK_input', OnHUDChatInputKeyDown, false, GFxListenerPriority, false);;
+}
+
+function WriteToChat(string Message, string HexColor)
+{
+    if (KFPlayerOwner.MyGFxManager.PartyWidget != None && KFPlayerOwner.MyGFxManager.PartyWidget.PartyChatWidget != None)
+        KFPlayerOwner.MyGFxManager.PartyWidget.PartyChatWidget.AddChatMessage(Message, HexColor);
+
+    if (HUDMovie != None && HUDMovie.HudChatBox != None)
+        HUDMovie.HudChatBox.AddChatMessage(Message, HexColor);
 }
 
 function ResetHUDColors()
@@ -472,6 +589,17 @@ function SetupHUDTextures(optional bool bUseColorIcons)
 
 function PostRender()
 {
+    if( !bReplicatedColorTextures && HudOutlineColor != DefaultHudOutlineColor )
+    {
+        bReplicatedColorTextures = true;
+        SetupHUDTextures(true);
+    }
+    else if( bReplicatedColorTextures && HudOutlineColor == DefaultHudOutlineColor )
+    {
+        bReplicatedColorTextures = false;
+        SetupHUDTextures();
+    }
+    
     if( KFGRI == None )
         KFGRI = KFGameReplicationInfo(WorldInfo.GRI);
     
@@ -3415,21 +3543,8 @@ simulated function bool DrawFriendlyHumanPlayerInfo( KFPawn_Human KFPH )
     GUIStyle.DrawTextShadow(KFPRI.PlayerName, ScreenPos.X - (BarLength * 0.5f), ScreenPos.Y - 3.5f, 1, FontScale);
     
     //Info Color
-    switch(PlayerInfoType)
-    {
-        case INFO_CLASSIC:
-            CurrentArmorColor = BlueColor;
-            CurrentHealthColor = RedColor;
-            break;
-        case INFO_LEGACY:
-            CurrentArmorColor = ClassicArmorColor;
-            CurrentHealthColor = ClassicHealthColor;
-            break;
-        case INFO_MODERN:
-            CurrentArmorColor = ArmorColor;
-            CurrentHealthColor = HealthColor;
-            break;    
-    }
+    CurrentArmorColor = CustomArmorColor;
+    CurrentHealthColor = CustomHealthColor;
     CurrentArmorColor.A = FadeAlpha;
     CurrentHealthColor.A = FadeAlpha;
     
