@@ -143,14 +143,14 @@ function DrawMenu()
     Owner.CurrentStyle.DrawRectBox(BoxX, YPos, BoxW, DefFontHeight, 4);
     Canvas.SetDrawColor(250, 0, 0, 255);
     
-    Owner.CurrentStyle.DrawTextShadow(S, BoxX + ((BoxW-XL) / 2), YPos + ((DefFontHeight-YL) / 2), 1, FontScalar);
+    Owner.CurrentStyle.DrawTextShadow(S, BoxX + ((BoxW-XL) * 0.5f), YPos + ((DefFontHeight-YL) * 0.5f), 1, FontScalar);
 
     // Deficulty | Wave | MapName
 
     XPos = XPosCenter;
     YPos += DefFontHeight+Owner.HUDOwner.ScaledBorderSize;
 
-    S = " " $Class'KFCommon_LocalizedStrings'.Static.GetDifficultyString (KFGRI.GameDifficulty) $"  |  "$class'KFGFxHUD_ScoreboardMapInfoContainer'.default.WaveString@KFGRI.WaveNum $"  |  " $class'KFCommon_LocalizedStrings'.static.GetFriendlyMapName(PC.WorldInfo.GetMapName(true));
+    S = Class'KFCommon_LocalizedStrings'.Static.GetDifficultyString (KFGRI.GameDifficulty) $"  |  "$class'KFGFxHUD_ScoreboardMapInfoContainer'.default.WaveString@KFGRI.WaveNum $"  |  " $class'KFCommon_LocalizedStrings'.static.GetFriendlyMapName(PC.WorldInfo.GetMapName(true));
     Canvas.TextSize(S, XL, YL, FontScalar, FontScalar);
     
     BoxW = XL + (Owner.HUDOwner.ScaledBorderSize*4);
@@ -159,7 +159,7 @@ function DrawMenu()
     Owner.CurrentStyle.DrawRectBox(BoxX, YPos, BoxW, DefFontHeight, 4);
     Canvas.SetDrawColor(0, 250, 0, 255);
     
-    Owner.CurrentStyle.DrawTextShadow(S, BoxX + ((BoxW-XL) / 2), YPos + ((DefFontHeight-YL) / 2), 1, FontScalar);
+    Owner.CurrentStyle.DrawTextShadow(S, BoxX + ((BoxW-XL) * 0.5f), YPos + ((DefFontHeight-YL) * 0.5f), 1, FontScalar);
     
     // Players | Spectators | Alive | Time
 
@@ -175,7 +175,7 @@ function DrawMenu()
     Owner.CurrentStyle.DrawRectBox(BoxX, YPos, BoxW, DefFontHeight, 4);
     Canvas.SetDrawColor(250, 250, 0, 255);
     
-    Owner.CurrentStyle.DrawTextShadow(S, BoxX + ((BoxW-XL) / 2), YPos + ((DefFontHeight-YL) / 2), 1, FontScalar);
+    Owner.CurrentStyle.DrawTextShadow(S, BoxX + ((BoxW-XL) * 0.5f), YPos + ((DefFontHeight-YL) * 0.5f), 1, FontScalar);
     
     Width = Canvas.ClipX * 0.625;
 
@@ -242,7 +242,7 @@ function DrawPlayerEntry( Canvas C, int Index, float YOffset, float Height, floa
     
     C.Font = Owner.CurrentStyle.PickFont(FontScalar);
     
-    TextYOffset = YOffset + (Height / 2) - (Owner.CurrentStyle.DefaultHeight / 2);
+    TextYOffset = YOffset + (Height * 0.5f) - (Owner.CurrentStyle.DefaultHeight * 0.5f);
     if (PlayerIndex == Index)
         C.SetDrawColor (51, 30, 101, 150);
     else C.SetDrawColor (30, 30, 30, 150);
@@ -255,7 +255,7 @@ function DrawPlayerEntry( Canvas C, int Index, float YOffset, float Height, floa
     if( bIsZED )
     {
         C.SetDrawColor(255,0,0,255);
-        C.SetPos (PerkXPos, YOffset - ((Height-5) / 2));
+        C.SetPos (PerkXPos, YOffset - ((Height-5) * 0.5f));
         C.DrawRect (Height-5, Height-5, Texture2D'UI_Widgets.MenuBarWidget_SWF_IF');
         
         S = "ZED";
@@ -309,9 +309,9 @@ function DrawPlayerEntry( Canvas C, int Index, float YOffset, float Height, floa
             CheckAvatar(KFPRI, OwnerPC);
             
         C.SetDrawColor(255,255,255,255);
-        C.SetPos(PlayerXPos - (Height * 1.075), YOffset + (Height / 2) - ((Height - 6) / 2));
+        C.SetPos(PlayerXPos - (Height * 1.075), YOffset + (Height * 0.5f) - ((Height - 6) * 0.5f));
         C.DrawTile(KFPRI.Avatar,Height - 6,Height - 6,0,0,KFPRI.Avatar.SizeX,KFPRI.Avatar.SizeY);
-        Owner.CurrentStyle.DrawBoxHollow(PlayerXPos - (Height * 1.075), YOffset + (Height / 2) - ((Height - 6) / 2), Height - 6, Height - 6, 1);
+        Owner.CurrentStyle.DrawBoxHollow(PlayerXPos - (Height * 1.075), YOffset + (Height * 0.5f) - ((Height - 6) * 0.5f), Height - 6, Height - 6, 1);
     } 
     else if( !KFPRI.bBot )
         CheckAvatar(KFPRI, OwnerPC);

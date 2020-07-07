@@ -181,34 +181,31 @@ function ShowKillMessage(PlayerReplicationInfo PRI1, PlayerReplicationInfo PRI2,
 
     KFPM = class<KFPawn_Monster>(OptionalObject);
 
-    if( KFGXHUDManager != none )
+    if(bDeathMessage)
     {
-        if(bDeathMessage)
-        {
-            if(KFPM != none)
-                KillerName=KFPM.static.GetLocalizedName();
-        }
-        else
-        {
-            if(KFPM != none)
-            {
-                KilledName=KFPM.static.GetLocalizedName();
-                bHumanDeath=false;
-            }
-            else if(PRI1 != none)
-                KillerName=PRI1.PlayerName;
-        }
-
-        if(PRI2 != none)
-        {
-            if(PRI2.GetTeamNum() == class'KFTeamInfo_Human'.default.TeamIndex)
-                bHumanDeath=true;
-            else bHumanDeath=false;
-            KilledName=PRI2.PlayerName;
-        }
-
-        ClassicKFHUD(KFPC.myHUD).ShowKillMessage(PRI1, PRI2, bHumanDeath, KilledName, KillerName);
+        if(KFPM != none)
+            KillerName=KFPM.static.GetLocalizedName();
     }
+    else
+    {
+        if(KFPM != none)
+        {
+            KilledName=KFPM.static.GetLocalizedName();
+            bHumanDeath=false;
+        }
+        else if(PRI1 != none)
+            KillerName=PRI1.PlayerName;
+    }
+
+    if(PRI2 != none)
+    {
+        if(PRI2.GetTeamNum() == class'KFTeamInfo_Human'.default.TeamIndex)
+            bHumanDeath=true;
+        else bHumanDeath=false;
+        KilledName=PRI2.PlayerName;
+    }
+
+    ClassicKFHUD(KFPC.myHUD).ShowKillMessage(PRI1, PRI2, bHumanDeath, KilledName, KillerName);
 }
 
 DefaultProperties
