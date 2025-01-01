@@ -12,7 +12,7 @@ function ShowSongInfo(string SongInfoString)
 	if(KFEngine != none && KFEngine.MusicVolumeMultiplier > 0)
 	{
         Msg.Body = SongInfoString;
-        Msg.Image = Texture2D'UI_HUD.InGameHUD_SWF_IBC';
+        Msg.Image = Texture2D'UI_HUD.InGameHUD_ZED_SWF_I124';
         Msg.MsgPosition = PP_TOP_CENTER;
         
         HUD.AddPopupMessage(Msg);

@@ -33,7 +33,7 @@ var byte CursorFade, FastCursorFade, CursorFlash;
 var int CursorStep, FastCursorStep;
 var int FontBlurX,FontBlurX2,FontBlurY,FontBlurY2,FastFontBlurX,FastFontBlurX2,FastFontBlurY,FastFontBlurY2;
 
-var bool bMouseWasIdle,bIsInMenuState,bAbsorbInput,bIsInvalid,bFinishedReplication,bHideCursor,bUsingGamepad,bForceEngineCursor,bNoInputReset;
+var bool bMouseWasIdle,bIsInMenuState,bAbsorbInput,bIsInvalid,bHideCursor,bUsingGamepad,bForceEngineCursor,bNoInputReset;
 
 static function KF2GUIController GetGUIController( PlayerController PC )
 {
@@ -69,13 +69,10 @@ simulated function PostBeginPlay()
     CurrentStyle = new (None) DefaultStyle;
     CurrentStyle.InitStyle();
     CurrentStyle.Owner = self;
+    CurrentStyle.HUDOwner = HUDOwner;
     
     SetTimer(0.1, true, 'SetupFontBlur');
     SetTimer(0.05, true, 'SetupFastFontBlur');
-    
-    SetTimer(0.25, true, 'SetupStyleTextures');
-    SetupStyleTextures();
-    
     SetTimer(0.75, true, 'SetupCursorFlash');
 }
 
@@ -84,95 +81,6 @@ simulated function SetupCursorFlash()
     if( CursorFlash == 255 )
         CursorFlash = 0;
     else CursorFlash = 255;
-}
-
-simulated function SetupStyleTextures()
-{
-    local ObjectReferencer RepObject;
-
-    RepObject = HUDOwner.RepObject;
-    if( RepObject != None )
-    {
-        CurrentStyle.MainFont = Font(RepObject.ReferencedObjects[104]);
-        CurrentStyle.InfiniteFont = Font(RepObject.ReferencedObjects[155]);
-        
-        CurrentStyle.BorderTextures[`BOX_INNERBORDER] = Texture2D(RepObject.ReferencedObjects[35]);
-        CurrentStyle.BorderTextures[`BOX_INNERBORDER_TRANSPARENT] = Texture2D(RepObject.ReferencedObjects[36]);
-        CurrentStyle.BorderTextures[`BOX_MEDIUM] = Texture2D(RepObject.ReferencedObjects[46]);
-        CurrentStyle.BorderTextures[`BOX_MEDIUM_SLIGHTTRANSPARENT] = Texture2D(RepObject.ReferencedObjects[47]);
-        CurrentStyle.BorderTextures[`BOX_MEDIUM_TRANSPARENT] = Texture2D(RepObject.ReferencedObjects[48]);
-        CurrentStyle.BorderTextures[`BOX_LARGE] = Texture2D(RepObject.ReferencedObjects[79]);
-        CurrentStyle.BorderTextures[`BOX_LARGE_SLIGHTTRANSPARENT] = Texture2D(RepObject.ReferencedObjects[80]);
-        CurrentStyle.BorderTextures[`BOX_LARGE_TRANSPARENT] = Texture2D(RepObject.ReferencedObjects[81]);
-        CurrentStyle.BorderTextures[`BOX_SMALL] = Texture2D(RepObject.ReferencedObjects[82]);
-        CurrentStyle.BorderTextures[`BOX_SMALL_SLIGHTTRANSPARENT] = Texture2D(RepObject.ReferencedObjects[83]);
-        CurrentStyle.BorderTextures[`BOX_SMALL_TRANSPARENT] = Texture2D(RepObject.ReferencedObjects[84]);
-        CurrentStyle.BorderTextures[`BOX_CORNER_8] = Texture2D(RepObject.ReferencedObjects[160]);
-        CurrentStyle.BorderTextures[`BOX_CORNER_16] = Texture2D(RepObject.ReferencedObjects[156]);
-        CurrentStyle.BorderTextures[`BOX_CORNER_32] = Texture2D(RepObject.ReferencedObjects[157]);
-        CurrentStyle.BorderTextures[`BOX_CORNER_64] = Texture2D(RepObject.ReferencedObjects[159]);
-        CurrentStyle.BorderTextures[`BOX_CORNER_512] = Texture2D(RepObject.ReferencedObjects[158]);
-        
-        CurrentStyle.ArrowTextures[`ARROW_DOWN] = Texture2D(RepObject.ReferencedObjects[10]);
-        CurrentStyle.ArrowTextures[`ARROW_LEFT] = Texture2D(RepObject.ReferencedObjects[45]);
-        CurrentStyle.ArrowTextures[`ARROW_RIGHT] = Texture2D(RepObject.ReferencedObjects[69]);
-        CurrentStyle.ArrowTextures[`ARROW_UP] = Texture2D(RepObject.ReferencedObjects[87]);
-        
-        CurrentStyle.ButtonTextures[`BUTTON_NORMAL] = Texture2D(RepObject.ReferencedObjects[3]);
-        CurrentStyle.ButtonTextures[`BUTTON_DISABLED] = Texture2D(RepObject.ReferencedObjects[4]);
-        CurrentStyle.ButtonTextures[`BUTTON_HIGHLIGHTED] = Texture2D(RepObject.ReferencedObjects[5]);
-        CurrentStyle.ButtonTextures[`BUTTON_PRESSED] = Texture2D(RepObject.ReferencedObjects[6]);
-        
-        CurrentStyle.TabTextures[`TAB_TOP] = Texture2D(RepObject.ReferencedObjects[76]);
-        CurrentStyle.TabTextures[`TAB_BOTTOM] = Texture2D(RepObject.ReferencedObjects[77]);
-        
-        CurrentStyle.ItemBoxTextures[`ITEMBOX_NORMAL] = Texture2D(RepObject.ReferencedObjects[40]);
-        CurrentStyle.ItemBoxTextures[`ITEMBOX_DISABLED] = Texture2D(RepObject.ReferencedObjects[41]);
-        CurrentStyle.ItemBoxTextures[`ITEMBOX_HIGHLIGHTED] = Texture2D(RepObject.ReferencedObjects[42]);
-        
-        CurrentStyle.ItemBoxTextures[`ITEMBOX_BAR_NORMAL] = Texture2D(RepObject.ReferencedObjects[37]);
-        CurrentStyle.ItemBoxTextures[`ITEMBOX_BAR_DISABLED] = Texture2D(RepObject.ReferencedObjects[38]);
-        CurrentStyle.ItemBoxTextures[`ITEMBOX_BAR_HIGHLIGHTED] = Texture2D(RepObject.ReferencedObjects[39]);
-        
-        CurrentStyle.CheckBoxTextures[`CHECKMARK_NORMAL] = Texture2D(RepObject.ReferencedObjects[7]);
-        CurrentStyle.CheckBoxTextures[`CHECKMARK_DISABLED] = Texture2D(RepObject.ReferencedObjects[8]);
-        CurrentStyle.CheckBoxTextures[`CHECKMARK_HIGHLIGHTED] = Texture2D(RepObject.ReferencedObjects[9]);
-        
-        CurrentStyle.PerkBox[`PERK_BOX_SELECTED] = Texture2D(RepObject.ReferencedObjects[60]);
-        CurrentStyle.PerkBox[`PERK_BOX_UNSELECTED] = Texture2D(RepObject.ReferencedObjects[61]);
-        
-        CurrentStyle.ScrollTexture = Texture2D(RepObject.ReferencedObjects[71]);
-        CurrentStyle.FavoriteIcon = Texture2D(RepObject.ReferencedObjects[105]);
-        CurrentStyle.BankNoteIcon = Texture2D(RepObject.ReferencedObjects[106]);
-        
-        CurrentStyle.ProgressBarTextures[`PROGRESS_BAR_NORMAL] = Texture2D(RepObject.ReferencedObjects[103]);
-        CurrentStyle.ProgressBarTextures[`PROGRESS_BAR_SELECTED] = Texture2D(RepObject.ReferencedObjects[68]);
-
-        CurrentStyle.SliderTextures[`SLIDER_NORMAL] = Texture2D(RepObject.ReferencedObjects[110]);
-        CurrentStyle.SliderTextures[`SLIDER_GRIP] = Texture2D(RepObject.ReferencedObjects[111]);
-        CurrentStyle.SliderTextures[`SLIDER_DISABLED] = Texture2D(RepObject.ReferencedObjects[112]);
-        
-        CurrentStyle.MenuDown = SoundCue(RepObject.ReferencedObjects[49]);
-        CurrentStyle.MenuDrag = SoundCue(RepObject.ReferencedObjects[50]);
-        CurrentStyle.MenuEdit = SoundCue(RepObject.ReferencedObjects[51]);
-        CurrentStyle.MenuFade = SoundCue(RepObject.ReferencedObjects[52]);
-        CurrentStyle.MenuClick = SoundCue(RepObject.ReferencedObjects[53]);
-        CurrentStyle.MenuHover = SoundCue(RepObject.ReferencedObjects[54]);
-        CurrentStyle.MenuUp = SoundCue(RepObject.ReferencedObjects[55]);
-        
-        DefaultPens[`PEN_WHITE] = Texture2D(RepObject.ReferencedObjects[108]);
-        DefaultPens[`PEN_BLACK] = Texture2D(RepObject.ReferencedObjects[107]);
-        DefaultPens[`PEN_GRAY] = Texture2D(RepObject.ReferencedObjects[109]);
-        
-        /*
-        CursorTextures[`CURSOR_DEFAULT] = Texture2D(RepObject.ReferencedObjects[119]);
-        CursorTextures[`CURSOR_RESIZEVERT] = Texture2D(RepObject.ReferencedObjects[120]);
-        CursorTextures[`CURSOR_RESIZEHORZ] = Texture2D(RepObject.ReferencedObjects[121]);
-        */
-        
-        bFinishedReplication = true;
-        ClearTimer('SetupStyleTextures');
-    }
 }
 
 simulated function SetupFastFontBlur()
@@ -241,7 +149,7 @@ simulated function HandleDrawMenu()
         ClientViewport.ViewportConsole = HackConsole;
         
         // Make sure nothing overrides these settings while menu is being open.
-        if( bIsInMenuState ) PlayerOwner.PlayerInput = CustomInput;
+        PlayerOwner.PlayerInput = CustomInput;
     }
 }
 simulated function RenderMenu( Canvas C )
@@ -249,68 +157,43 @@ simulated function RenderMenu( Canvas C )
     local int i;
     local float OrgX,OrgY,ClipX,ClipY;
     
-    if( !bFinishedReplication )
-        return;
-
     ClientViewport.ViewportConsole = OrgConsole;
+
+    ScreenSize.X = C.SizeX;
+    ScreenSize.Y = C.SizeY;
+    CurrentStyle.Canvas = C;
+    CurrentStyle.PickDefaultFontSize(C.SizeY);
 
     OrgX = C.OrgX;
     OrgY = C.OrgY;
     ClipX = C.ClipX;
     ClipY = C.ClipY;
-    
-    ScreenSize.X = C.SizeX;
-    ScreenSize.Y = C.SizeY;
-    CurrentStyle.Canvas = C;
-    CurrentStyle.PickDefaultFontSize(C.SizeY);
-    
-    if( !KFPlayerController(PlayerOwner).MyGFxManager.bMenusActive )
-    {
-        HUDOwner.Canvas = C;
-        HUDOwner.RenderKFHUD(KFPawn_Human(PlayerOwner.Pawn));
-        
-        for( i=(HUDOwner.HUDWidgets.Length-1); i>=0; --i )
-        {
-            HUDOwner.HUDWidgets[i].InputPos[0] = 0.f;
-            HUDOwner.HUDWidgets[i].InputPos[1] = 0.f;
-            HUDOwner.HUDWidgets[i].InputPos[2] = ScreenSize.X;
-            HUDOwner.HUDWidgets[i].InputPos[3] = ScreenSize.Y;
-            HUDOwner.HUDWidgets[i].Canvas = C;
-            HUDOwner.HUDWidgets[i].PreDraw();
-        }
-        
-        C.SetOrigin(OrgX,OrgY);
-        C.SetClip(ClipX,ClipY);
-    }
-    
-    if( bIsInMenuState )
-    {
-        for( i=(ActiveMenus.Length-1); i>=0; --i )
-        {
-            ActiveMenus[i].bWindowFocused = (i==0);
-            ActiveMenus[i].InputPos[0] = 0.f;
-            ActiveMenus[i].InputPos[1] = 0.f;
-            ActiveMenus[i].InputPos[2] = ScreenSize.X;
-            ActiveMenus[i].InputPos[3] = ScreenSize.Y;
-            ActiveMenus[i].Canvas = C;
-            ActiveMenus[i].PreDraw();
-        }
-        if( InputFocus!=None && InputFocus.bFocusedPostDrawItem )
-        {
-            InputFocus.InputPos[0] = 0.f;
-            InputFocus.InputPos[1] = 0.f;
-            InputFocus.InputPos[2] = ScreenSize.X;
-            InputFocus.InputPos[3] = ScreenSize.Y;
-            InputFocus.Canvas = C;
-            InputFocus.PreDraw();
-        }
-        C.SetOrigin(OrgX,OrgY);
-        C.SetClip(ClipX,ClipY);
 
-        if (!bHideCursor)
-        {
-            DrawCursor(C, MousePosition.X, MousePosition.Y);
-        }
+    for( i=(ActiveMenus.Length-1); i>=0; --i )
+    {
+        ActiveMenus[i].bWindowFocused = (i==0);
+        ActiveMenus[i].InputPos[0] = 0.f;
+        ActiveMenus[i].InputPos[1] = 0.f;
+        ActiveMenus[i].InputPos[2] = ScreenSize.X;
+        ActiveMenus[i].InputPos[3] = ScreenSize.Y;
+        ActiveMenus[i].Canvas = C;
+        ActiveMenus[i].PreDraw();
+    }
+    if( InputFocus!=None && InputFocus.bFocusedPostDrawItem )
+    {
+        InputFocus.InputPos[0] = 0.f;
+        InputFocus.InputPos[1] = 0.f;
+        InputFocus.InputPos[2] = ScreenSize.X;
+        InputFocus.InputPos[3] = ScreenSize.Y;
+        InputFocus.Canvas = C;
+        InputFocus.PreDraw();
+    }
+    C.SetOrigin(OrgX,OrgY);
+    C.SetClip(ClipX,ClipY);
+
+    if (!bHideCursor)
+    {
+        DrawCursor(C, MousePosition.X, MousePosition.Y);
     }
     
     if( OrgConsole!=None )
@@ -346,7 +229,6 @@ simulated final function SetMenuState( bool bActive )
     if( bIsInMenuState==bActive )
         return;
     bIsInMenuState = bActive;
-    bHideCursor = !bActive;
 
     if( bActive )
     {
@@ -981,13 +863,17 @@ simulated Delegate bool InternalReceivedInputChar( int ControllerId, string Unic
 
 defaultproperties
 {
+    DefaultStyle=class'ClassicStyle'
+    
     CursorSize=24
     CursorColor=(R=255,G=255,B=255,A=255)
     CursorTextures[`CURSOR_DEFAULT]=Texture2D'UI_Managers.LoaderManager_SWF_I13'
     CurrentCursorIndex=`CURSOR_DEFAULT
     
-    DefaultStyle=class'ClassicStyle'
+    DefaultPens[`PEN_WHITE]=Texture2D'KFClassicHUD_Assets.HUD.MenuGray'
+    DefaultPens[`PEN_BLACK]=Texture2D'KFClassicHUD_Assets.HUD.MenuBlack'
+    DefaultPens[`PEN_GRAY]=Texture2D'KFClassicHUD_Assets.HUD.MenuWhite'
+    
     bAbsorbInput=true
     bAlwaysTick=true
-    bHideCursor=true
 }

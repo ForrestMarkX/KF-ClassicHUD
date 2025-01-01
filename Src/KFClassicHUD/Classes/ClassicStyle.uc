@@ -370,7 +370,9 @@ function RenderButton( KFGUI_Button B )
         if( B.bDisabled )
             Canvas.DrawColor = B.TextColor*0.5f;
         else Canvas.DrawColor = B.TextColor;
-        Canvas.DrawText(B.ButtonText,,TS,TS,B.TextFontInfo);
+        if( B.TextFontInfo.bEnableShadow )
+            DrawTextShadow(B.ButtonText, Canvas.CurX, Canvas.CurY, 1, TS, B.TextFontInfo);
+        else Canvas.DrawText(B.ButtonText,,TS,TS,B.TextFontInfo);
         
         if( B.GetUsingGamepad() )
         {
@@ -405,4 +407,61 @@ function RenderButton( KFGUI_Button B )
 
 defaultproperties
 {
+    BorderTextures[`BOX_INNERBORDER]=Texture2D'KFClassicHUD_Assets.HUD.Innerborder'
+    BorderTextures[`BOX_INNERBORDER_TRANSPARENT]=Texture2D'KFClassicHUD_Assets.HUD.Innerborder_transparent'
+    BorderTextures[`BOX_MEDIUM]=Texture2D'KFClassicHUD_Assets.HUD.Med_border'
+    BorderTextures[`BOX_MEDIUM_SLIGHTTRANSPARENT]=Texture2D'KFClassicHUD_Assets.HUD.Med_border_SlightTransparent'
+    BorderTextures[`BOX_MEDIUM_TRANSPARENT]=Texture2D'KFClassicHUD_Assets.HUD.Med_border_Transparent'
+    BorderTextures[`BOX_LARGE]=Texture2D'KFClassicHUD_Assets.HUD.Thick_border'
+    BorderTextures[`BOX_LARGE_SLIGHTTRANSPARENT]=Texture2D'KFClassicHUD_Assets.HUD.Thick_border_SlightTransparent'
+    BorderTextures[`BOX_LARGE_TRANSPARENT]=Texture2D'KFClassicHUD_Assets.HUD.Thick_border_Transparent'
+    BorderTextures[`BOX_SMALL]=Texture2D'KFClassicHUD_Assets.HUD.Thin_border'
+    BorderTextures[`BOX_SMALL_SLIGHTTRANSPARENT]=Texture2D'KFClassicHUD_Assets.HUD.Thin_border_SlightTransparent'
+    BorderTextures[`BOX_SMALL_TRANSPARENT]=Texture2D'KFClassicHUD_Assets.HUD.Thin_border_Transparent'
+    
+    ArrowTextures[`ARROW_DOWN]=Texture2D'KFClassicHUD_Assets.HUD.DownMark'
+    ArrowTextures[`ARROW_LEFT]=Texture2D'KFClassicHUD_Assets.HUD.LeftMark'
+    ArrowTextures[`ARROW_RIGHT]=Texture2D'KFClassicHUD_Assets.HUD.RightMark'
+    ArrowTextures[`ARROW_UP]=Texture2D'KFClassicHUD_Assets.HUD.UpMark'
+    
+    ButtonTextures[`BUTTON_NORMAL]=Texture2D'KFClassicHUD_Assets.HUD.Button'
+    ButtonTextures[`BUTTON_DISABLED]=Texture2D'KFClassicHUD_Assets.HUD.BUTTON_DISABLED'
+    ButtonTextures[`BUTTON_HIGHLIGHTED]=Texture2D'KFClassicHUD_Assets.HUD.button_Highlight'
+    ButtonTextures[`BUTTON_PRESSED]=Texture2D'KFClassicHUD_Assets.HUD.BUTTON_PRESSED'
+    
+    TabTextures[`TAB_TOP]=Texture2D'KFClassicHUD_Assets.HUD.Tabdark'
+    TabTextures[`TAB_BOTTOM]=Texture2D'KFClassicHUD_Assets.HUD.Tabdark_Bottom'
+    
+    ItemBoxTextures[`ITEMBOX_NORMAL]=Texture2D'KFClassicHUD_Assets.HUD.Item_box_box'
+    ItemBoxTextures[`ITEMBOX_DISABLED]=Texture2D'KFClassicHUD_Assets.HUD.Item_box_box_Disabled'
+    ItemBoxTextures[`ITEMBOX_HIGHLIGHTED]=Texture2D'KFClassicHUD_Assets.HUD.Item_box_box_Highlighted'
+    
+    ItemBoxTextures[`ITEMBOX_BAR_NORMAL]=Texture2D'KFClassicHUD_Assets.HUD.Item_box_bar'
+    ItemBoxTextures[`ITEMBOX_BAR_DISABLED]=Texture2D'KFClassicHUD_Assets.HUD.Item_box_bar_Disabled'
+    ItemBoxTextures[`ITEMBOX_BAR_HIGHLIGHTED]=Texture2D'KFClassicHUD_Assets.HUD.Item_box_bar_Highlighted'
+    
+    CheckBoxTextures[`CHECKMARK_NORMAL]=Texture2D'KFClassicHUD_Assets.HUD.Checkbox'
+    CheckBoxTextures[`CHECKMARK_DISABLED]=Texture2D'KFClassicHUD_Assets.HUD.checkbox_dark'
+    CheckBoxTextures[`CHECKMARK_HIGHLIGHTED]=Texture2D'KFClassicHUD_Assets.HUD.checkbox_highlight'
+    
+    PerkBox[`PERK_BOX_SELECTED]=Texture2D'KFClassicHUD_Assets.HUD.Perk_box'
+    PerkBox[`PERK_BOX_UNSELECTED]=Texture2D'KFClassicHUD_Assets.HUD.Perk_box_unselected'
+    
+    ScrollTexture=Texture2D'KFClassicHUD_Assets.HUD.ScrollBar'
+    BankNoteIcon=Texture2D'KFClassicHUD_Assets.HUD.BanknoteSkin'
+    
+    ProgressBarTextures[`PROGRESS_BAR_NORMAL]=Texture2D'KFClassicHUD_Assets.HUD.progress_bar'
+    ProgressBarTextures[`PROGRESS_BAR_SELECTED]=Texture2D'KFClassicHUD_Assets.HUD.Progress'
+
+    SliderTextures[`SLIDER_NORMAL]=Texture2D'KFClassicHUD_Assets.HUD.SliderFillBlurry'
+    SliderTextures[`SLIDER_GRIP]=Texture2D'KFClassicHUD_Assets.HUD.SliderGripBlurry'
+    SliderTextures[`SLIDER_DISABLED]=Texture2D'KFClassicHUD_Assets.HUD.SliderBarDisabled'
+
+    MenuDown=SoundCue'KFClassicHUD_Assets.HUD.Menu_Down'
+    MenuDrag=SoundCue'KFClassicHUD_Assets.HUD.Menu_Drag'
+    MenuEdit=SoundCue'KFClassicHUD_Assets.HUD.Menu_Edit'
+    MenuFade=SoundCue'KFClassicHUD_Assets.HUD.Menu_Fade'
+    MenuClick=SoundCue'KFClassicHUD_Assets.HUD.Menu_MouseClick'
+    MenuHover=SoundCue'KFClassicHUD_Assets.HUD.Menu_MouseHover'
+    MenuUp=SoundCue'KFClassicHUD_Assets.HUD.Menu_Up'
 }

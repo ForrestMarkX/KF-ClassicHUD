@@ -5,13 +5,14 @@ var int LastHitHP;
 var KFPlayerController LastDamageDealer;
 var vector LastDamagePosition;
 var class<KFDamageType> LastDamageDMGType;
-
-struct RepInfoS
-{
-    var DamageReplicationInfo DRI;
-    var KFPlayerController KFPC;
-};
+var KFDamageMutator DamageMutator;
 var array<RepInfoS> DamageReplicationInfos;
+
+simulated function PreBeginPlay()
+{
+    Super.PreBeginPlay();
+	DamageMutator = Spawn(class'KFDamageMutator');
+}
 
 function PostBeginPlay()
 {
@@ -39,24 +40,20 @@ function NetDamage(int OriginalDamage, out int Damage, Pawn Injured, Controller 
             LastHitHP = LastHitZed.Health;
             LastDamagePosition = HitLocation;
             LastDamageDMGType = class<KFDamageType>(DamageType);
-            SetTimer(0.1,false,'CheckDamageDone');
+            TimerHelper.SetTimer(0.1,false,'CheckDamageDone');
         }
     }
 }
 
 final function CheckDamageDone()
 {
-    local int Damage, i;
+    local int Damage;
 
     if( LastDamageDealer!=None && LastHitZed!=None && LastHitHP!=LastHitZed.Health )
     {
         Damage = LastHitHP-Max(LastHitZed.Health,0);
         if( Damage>0 )
-        {
-            i = DamageReplicationInfos.Find('KFPC', LastDamageDealer);
-            if( i != INDEX_NONE )
-                DamageReplicationInfos[i].DRI.ClientNumberMsg(Damage,LastDamagePosition,LastDamageDMGType);
-        }
+			DamageMutator.CheckDamageDone(DamageReplicationInfos, LastDamageDealer, Damage, LastDamagePosition, LastDamageDMGType);
     }
     LastDamageDealer = None;
 }
@@ -93,11 +90,14 @@ function DestroyReplicationInfo(KFPlayerController C)
 {
     local int i;
     
-    i = DamageReplicationInfos.Find('KFPC', C);
-    if( i != INDEX_NONE )
+	for( i=0; i<DamageReplicationInfos.Length; i++ )
     {
-        DamageReplicationInfos[i].DRI.Destroy();
-        DamageReplicationInfos.RemoveItem(DamageReplicationInfos[i]);
+		if( DamageReplicationInfos[i].KFPC == C )
+		{
+			DamageReplicationInfos[i].DRI.Destroy();
+			DamageReplicationInfos.RemoveItem(DamageReplicationInfos[i]);
+			break;
+		}
     }
 }
 

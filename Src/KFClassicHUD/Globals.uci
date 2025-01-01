@@ -79,3 +79,5 @@
 `define CURSOR_RESIZEHORZ 	3
 
 `define Print(log) LocalPlayer(class'WorldInfo'.static.GetWorldInfo().GetALocalPlayerController().Player).ViewportClient.ViewportConsole.OutputText(`log)
+`define FindDefaultObject(ObjClass) FindObject(`ObjClass.GetPackageName()$"."$`ObjClass.default.Name,`ObjClass)
+`define SafeLoadObject(S, ObjClass, bCanFail) class'GUIStyleBase'.static.SafeLoadObject(`S, `ObjClass, `bCanFail)

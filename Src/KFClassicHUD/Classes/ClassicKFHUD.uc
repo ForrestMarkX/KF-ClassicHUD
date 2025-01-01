@@ -85,6 +85,7 @@ var Texture ArrowIcon, FlameIcon, FlameTankIcon, FlashlightIcon, FlashlightOffIc
 var Texture TraderBox, TraderArrow, TraderArrowLight;
 var Texture VoiceChatIcon;
 var Texture2D PerkStarIcon, DoshEarnedIcon;
+var Texture DoorWelderIconColor, HealthIconColor, ArmorIconColor, WeightIconColor, GrenadesIconColor, DoshIconColor, BulletsIconColor, ClipsIconColor, BurstBulletIconColor, AutoTargetIconColor, ArrowIconColor, FlameIconColor, FlameTankIconColor, FlashlightIconColor, FlashlightOffIconColor, RocketIconColor, BoltIconColor, M79IconColor, PipebombIconColor, SingleBulletIconColor, SyringIconColor, SawbladeIconColor, ManualTargetIconColor, WaveCircleColor, BioCircleColor;
 
 var KFDroppedPickup WeaponPickup;
 var float MaxWeaponPickupDist;
@@ -193,7 +194,6 @@ var int MaxWeaponsPerCatagory;
 var float ScaledBorderSize;
 
 var const Color BlueColor;
-var ObjectReferencer RepObject;
 var transient KF2GUIController GUIController;
 var transient GUIStyleBase GUIStyle;
 
@@ -348,9 +348,7 @@ simulated function PostBeginPlay()
     
     if( bSaveConfig )
         SaveConfig();
-    
-    SetupHUDTextures();
-    
+
     SetTimer(0.1, true, 'SetupFontBlur');
     SetTimer(0.1f, true, 'CheckForWeaponPickup');
     SetTimer(0.1f, true, 'BuildCacheItems');
@@ -375,10 +373,44 @@ simulated function PostBeginPlay()
         CreateHUDMovie();
     }
     
+    SetupHUDTextures();
+    
     SetTimer(0.25f, false, nameof(InitializeHUD));
     
     InitializePartyChatHook();
     InitializeHUDChatHook();
+}
+
+function SetupHUDTextures(optional bool bUseColorIcons)
+{
+    HealthIcon = bUseColorIcons ? HealthIconColor : default.HealthIcon;
+    ArmorIcon = bUseColorIcons ? ArmorIconColor : default.ArmorIcon;
+    WeightIcon = bUseColorIcons ? WeightIconColor : default.WeightIcon;
+    GrenadesIcon = bUseColorIcons ? GrenadesIconColor : default.GrenadesIcon;
+    DoshIcon = bUseColorIcons ? DoshIconColor : default.DoshIcon;
+    BulletsIcon = bUseColorIcons ? BulletsIconColor : default.BulletsIcon;
+    ClipsIcon = bUseColorIcons ? ClipsIconColor : default.ClipsIcon;
+    BurstBulletIcon = bUseColorIcons ? BurstBulletIconColor : default.BurstBulletIcon;
+    AutoTargetIcon = bUseColorIcons ? AutoTargetIconColor : default.AutoTargetIcon;
+    
+    ArrowIcon = bUseColorIcons ? ArrowIconColor : default.ArrowIcon;
+    FlameIcon = bUseColorIcons ? FlameIconColor : default.FlameIcon;
+    FlameTankIcon = bUseColorIcons ? FlameTankIconColor : default.FlameTankIcon;
+    FlashlightIcon = bUseColorIcons ? FlashlightIconColor : default.FlashlightIcon;
+    FlashlightOffIcon = bUseColorIcons ? FlashlightOffIconColor : default.FlashlightOffIcon;
+    RocketIcon = bUseColorIcons ? RocketIconColor : default.RocketIcon;
+    BoltIcon = bUseColorIcons ? BoltIconColor : default.BoltIcon;
+    M79Icon = bUseColorIcons ? M79IconColor : default.M79Icon;
+    PipebombIcon = bUseColorIcons ? PipebombIconColor : default.PipebombIcon;
+    SingleBulletIcon = bUseColorIcons ? SingleBulletIconColor : default.SingleBulletIcon;
+    SyringIcon = bUseColorIcons ? SyringIconColor : default.SyringIcon;
+    SawbladeIcon = bUseColorIcons ? SawbladeIconColor : default.SawbladeIcon;
+    ManualTargetIcon = bUseColorIcons ? ManualTargetIconColor : default.ManualTargetIcon;
+    
+    WaveCircle = bUseColorIcons ? WaveCircleColor : default.WaveCircle;
+    BioCircle = bUseColorIcons ? BioCircleColor : default.BioCircle;
+    
+    DoorWelderIcon = bUseColorIcons ? DoorWelderIconColor : default.DoorWelderIcon;
 }
 
 function InitializeHUD()
@@ -473,7 +505,6 @@ function ResetHUDColors()
     HudOutlineColor = DefaultHudOutlineColor;
     FontColor = DefaultFontColor;
     SaveConfig();
-    SetupHUDTextures();
 }
 
 function BuildCacheItems()
@@ -550,54 +581,12 @@ simulated function SetupFontBlur()
     FontBlurY2 = RandRange(-8, 8);
 }
 
-function SetupHUDTextures(optional bool bUseColorIcons)
-{
-    ProgressBarTex = Texture2D(RepObject.ReferencedObjects[85]);
-    
-    HealthIcon = bUseColorIcons ? Texture2D(RepObject.ReferencedObjects[146]) : Texture2D(RepObject.ReferencedObjects[27]);
-    ArmorIcon = bUseColorIcons ? Texture2D(RepObject.ReferencedObjects[149]) : Texture2D(RepObject.ReferencedObjects[31]);
-    WeightIcon = bUseColorIcons ? Texture2D(RepObject.ReferencedObjects[152]) : Texture2D(RepObject.ReferencedObjects[34]);
-    GrenadesIcon = bUseColorIcons ? Texture2D(RepObject.ReferencedObjects[142]) : Texture2D(RepObject.ReferencedObjects[23]);
-    DoshIcon = bUseColorIcons ? Texture2D(RepObject.ReferencedObjects[148]) : Texture2D(RepObject.ReferencedObjects[30]);
-    BulletsIcon = bUseColorIcons ? Texture2D(RepObject.ReferencedObjects[136]) : Texture2D(RepObject.ReferencedObjects[17]);
-    ClipsIcon = bUseColorIcons ? Texture2D(RepObject.ReferencedObjects[131]) : Texture2D(RepObject.ReferencedObjects[11]);
-    BurstBulletIcon = bUseColorIcons ? Texture2D(RepObject.ReferencedObjects[137]) : Texture2D(RepObject.ReferencedObjects[18]);
-    AutoTargetIcon = bUseColorIcons ? Texture2D(RepObject.ReferencedObjects[133]) : Texture2D(RepObject.ReferencedObjects[13]);
-    
-    ArrowIcon = bUseColorIcons ? Texture2D(RepObject.ReferencedObjects[132]) : Texture2D(RepObject.ReferencedObjects[12]);
-    FlameIcon = bUseColorIcons ? Texture2D(RepObject.ReferencedObjects[139]) : Texture2D(RepObject.ReferencedObjects[19]);
-    FlameTankIcon = bUseColorIcons ? Texture2D(RepObject.ReferencedObjects[138]) : Texture2D(RepObject.ReferencedObjects[20]);
-    FlashlightIcon = bUseColorIcons ? Texture2D(RepObject.ReferencedObjects[141]) : Texture2D(RepObject.ReferencedObjects[21]);
-    FlashlightOffIcon = bUseColorIcons ? Texture2D(RepObject.ReferencedObjects[140]) : Texture2D(RepObject.ReferencedObjects[22]);
-    RocketIcon = bUseColorIcons ? Texture2D(RepObject.ReferencedObjects[143]) : Texture2D(RepObject.ReferencedObjects[24]);
-    BoltIcon = bUseColorIcons ? Texture2D(RepObject.ReferencedObjects[144]) : Texture2D(RepObject.ReferencedObjects[25]);
-    M79Icon = bUseColorIcons ? Texture2D(RepObject.ReferencedObjects[145]) : Texture2D(RepObject.ReferencedObjects[26]);
-    PipebombIcon = bUseColorIcons ? Texture2D(RepObject.ReferencedObjects[147]) : Texture2D(RepObject.ReferencedObjects[29]);
-    SingleBulletIcon = bUseColorIcons ? Texture2D(RepObject.ReferencedObjects[150]) : Texture2D(RepObject.ReferencedObjects[32]);
-    SyringIcon = bUseColorIcons ? Texture2D(RepObject.ReferencedObjects[151]) : Texture2D(RepObject.ReferencedObjects[33]);
-    SawbladeIcon = bUseColorIcons ? Texture2D(RepObject.ReferencedObjects[153]) : Texture2D(RepObject.ReferencedObjects[78]);
-    ManualTargetIcon = bUseColorIcons ? Texture2D'KFClassicMode_Assets.HUD_Color.Hud_ManualTarget_White' : Texture2D'KFClassicMode_Assets.HUD.Hud_ManualTarget';
-    
-    TraderBox = Texture2D(RepObject.ReferencedObjects[16]);
-    
-    InventoryBackgroundTexture = Texture2D(RepObject.ReferencedObjects[113]);
-    SelectedInventoryBackgroundTexture = Texture2D(RepObject.ReferencedObjects[114]);
-    
-    WaveCircle = bUseColorIcons ? Texture2D(RepObject.ReferencedObjects[134]) : Texture2D(RepObject.ReferencedObjects[15]);
-    BioCircle = bUseColorIcons ? Texture2D(RepObject.ReferencedObjects[135]) : Texture2D(RepObject.ReferencedObjects[14]);
-}
-
 function PostRender()
 {
     if( !bReplicatedColorTextures && HudOutlineColor != DefaultHudOutlineColor )
     {
         bReplicatedColorTextures = true;
         SetupHUDTextures(true);
-    }
-    else if( bReplicatedColorTextures && HudOutlineColor == DefaultHudOutlineColor )
-    {
-        bReplicatedColorTextures = false;
-        SetupHUDTextures();
     }
     
     if( KFGRI == None )
@@ -1295,7 +1284,7 @@ function RenderKFHUD(KFPawn_Human KFPH)
         
         if( CircleText != "" )
         {
-            Canvas.Font = GUIStyle.PickFont(OriginalFontScalar, false, KFGRI.IsEndlessWave());
+            Canvas.Font = GUIStyle.PickFont(OriginalFontScalar, KFGRI.IsEndlessWave() ? FONT_INFINITE : FONT_NORMAL);
             
             FontScalar = OriginalFontScalar + GUIStyle.ScreenScale(KFGRI.IsEndlessWave() ? 0.75 : 0.3);
             DrawCircleSize = GUIStyle.ScreenScale(128);
@@ -1350,7 +1339,7 @@ function RenderKFHUD(KFPawn_Human KFPH)
         
     Inv = KFInventoryManager(KFPH.InvManager);
         
-    Canvas.Font = GUIStyle.PickFont(OriginalFontScalar, true);
+    Canvas.Font = GUIStyle.PickFont(OriginalFontScalar, FONT_NUMBER);
     FontScalar = OriginalFontScalar + GUIStyle.ScreenScale(0.3);
     
     HBRI.IconScale = scale_w2;
@@ -1468,7 +1457,7 @@ function RenderKFHUD(KFPawn_Human KFPH)
             Canvas.DrawColor = FontColor;
             GUIStyle.DrawTextShadow(PerkLevel@MyKFPRI.CurrentPerkClass.default.PerkName, PerkLevelXL, PerkLevelYL, 1, FontScalar);
             
-            Canvas.Font = GUIStyle.PickFont(OriginalFontScalar, true);
+            Canvas.Font = GUIStyle.PickFont(OriginalFontScalar, FONT_NUMBER);
             
             if( PrestigeLevel > 0 )
             {
@@ -1552,7 +1541,7 @@ function RenderKFHUD(KFPawn_Human KFPH)
                 Canvas.DrawColor = FontColor;
                 GUIStyle.DrawTextShadow(TraderDistanceText, Canvas.ClipX*0.015, YL, 1, FontScalar);
                 
-                Canvas.Font = GUIStyle.PickFont(OriginalFontScalar, true);
+                Canvas.Font = GUIStyle.PickFont(OriginalFontScalar, FONT_NUMBER);
             }
         }
         
@@ -1685,7 +1674,7 @@ function RenderKFHUD(KFPawn_Human KFPH)
                     Canvas.DrawText(ObjectiveStatusMessage,, FontScalar, FontScalar, FRI);
                 }
             }
-            Canvas.Font = GUIStyle.PickFont(OriginalFontScalar, true);
+            Canvas.Font = GUIStyle.PickFont(OriginalFontScalar, FONT_NUMBER);
         }
     }
     
@@ -3706,7 +3695,7 @@ simulated function Tick( float Delta )
     Super.Tick(Delta);
 }
 
-function DrawZedIcon( Pawn ZedPawn, vector PawnLocation, float NormalizedAngle )
+function DrawZedIcon( Pawn ZedPawn, vector PawnLocation, float NormalizedAngle, color ColorToUse, float SizeMultiplier )
 {
     DrawDirectionalIndicator(PawnLocation + (ZedPawn.CylinderComponent.CollisionHeight * vect(0, 0, 1)), GenericZedIconTexture, PlayerStatusIconSize * (WorldInfo.static.GetResolutionBasedHUDScale() * FriendlyHudScale) * 0.5f,,, GetNameOf(ZedPawn.Class));
 }
@@ -3782,8 +3771,8 @@ defaultproperties
     MaxWeaponPickupDist=700
     WeaponPickupScanRadius=75
     ZedScanRadius=200
-    WeaponAmmoIcon=Texture2D'UI_Menus.TraderMenu_SWF_I10B'
-    WeaponWeightIcon=Texture2D'UI_Menus.TraderMenu_SWF_I26'
+    WeaponAmmoIcon=Texture2D'UI_Menus.UpgradeV2TraderMenu_SWF_I10B'
+    WeaponWeightIcon=Texture2D'UI_Menus.UpgradeV2TraderMenu_SWF_I26'
     WeaponIconSize=32
     WeaponIconColor=(R=192,G=192,B=192,A=255)
     WeaponOverweightIconColor=(R=255,G=0,B=0,A=192)
@@ -3792,9 +3781,8 @@ defaultproperties
     NonCriticalMessageFadeInTime=0.65
     NonCriticalMessageFadeOutTime=0.5
     
-    RepObject=ObjectReferencer'KFClassicMode_Assets.ObjectRef.MainObj_List'
     HUDClass=class'KF1_HUDWrapper'
-    PerkStarIcon=Texture2D'KFClassicMode_Assets.HUD.Hud_Perk_Star'
+    PerkStarIcon=Texture2D'KFClassicHUD_Assets.HUD.Hud_Perk_Star'
     ScoreboardClass=class'KFScoreBoard'
     
     BossBattlePhaseColor=(R=0,B=0,G=150,A=175)
@@ -3818,11 +3806,76 @@ defaultproperties
     
     NewLineSeparator="|"
     
-    NotificationBackground=Texture2D'KFClassicMode_Assets.HUD.Med_border_SlightTransparent'
+    NotificationBackground=Texture2D'KFClassicHUD_Assets.HUD.Med_border_SlightTransparent'
     NotificationShowTime=0.3
     NotificationHideTime=0.5
     NotificationHideDelay=3.5
     NotificationBorderSize=7.0
     NotificationIconSpacing=10.0
     NotificationPhase=PHASE_DONE
+    
+    ProgressBarTex=Texture2D'KFClassicHUD_Assets.HUD.thinpipe_b'
+    
+    HealthIcon=Texture2D'KFClassicHUD_Assets.HUD.hud_medical_cross'
+    ArmorIcon=Texture2D'KFClassicHUD_Assets.HUD.hud_shield'
+    WeightIcon=Texture2D'KFClassicHUD_Assets.HUD.hud_weight'
+    GrenadesIcon=Texture2D'KFClassicHUD_Assets.HUD.hud_grenade'
+    DoshIcon=Texture2D'KFClassicHUD_Assets.HUD.hud_pound_symbol'
+    BulletsIcon=Texture2D'KFClassicHUD_Assets.HUD.hud_bullets'
+    ClipsIcon=Texture2D'KFClassicHUD_Assets.HUD.hud_ammo_clip'
+    BurstBulletIcon=Texture2D'KFClassicHUD_Assets.HUD.Hud_Burst_Bullet'
+    AutoTargetIcon=Texture2D'KFClassicHUD_Assets.HUD.Hud_AutoTarget'
+    
+    ArrowIcon=Texture2D'KFClassicHUD_Assets.HUD.Hud_Arrowhead'
+    FlameIcon=Texture2D'KFClassicHUD_Assets.HUD.Hud_Flame'
+    FlameTankIcon=Texture2D'KFClassicHUD_Assets.HUD.Hud_Flame_Tank'
+    FlashlightIcon=Texture2D'KFClassicHUD_Assets.HUD.Hud_Flashlight'
+    FlashlightOffIcon=Texture2D'KFClassicHUD_Assets.HUD.Hud_Flashlight_Off'
+    RocketIcon=Texture2D'KFClassicHUD_Assets.HUD.Hud_Law_Rocket'
+    BoltIcon=Texture2D'KFClassicHUD_Assets.HUD.Hud_Lightning_Bolt'
+    M79Icon=Texture2D'KFClassicHUD_Assets.HUD.Hud_M79'
+    PipebombIcon=Texture2D'KFClassicHUD_Assets.HUD.Hud_Pipebomb'
+    SingleBulletIcon=Texture2D'KFClassicHUD_Assets.HUD.Hud_Single_Bullet'
+    SyringIcon=Texture2D'KFClassicHUD_Assets.HUD.Hud_Syringe'
+    SawbladeIcon=Texture2D'KFClassicHUD_Assets.HUD.Texture_Hud_Sawblade'
+    ManualTargetIcon=Texture2D'KFClassicHUD_Assets.HUD.Hud_ManualTarget'
+    
+    TraderBox=Texture2D'KFClassicHUD_Assets.HUD.hud_box_128x64'
+    
+    InventoryBackgroundTexture=Texture2D'KFClassicHUD_Assets.HUD.Hud_Rectangel_W_Stroke'
+    SelectedInventoryBackgroundTexture=Texture2D'KFClassicHUD_Assets.HUD.Hud_Rectangel_selected'
+    
+    WaveCircle=Texture2D'KFClassicHUD_Assets.HUD.hud_bio_clock_circle'
+    BioCircle=Texture2D'KFClassicHUD_Assets.HUD.hud_bio_circle'
+    
+    HealthIconColor=Texture2D'KFClassicHUD_Assets.HUD_Color.hud_medical_cross_white'
+    ArmorIconColor=Texture2D'KFClassicHUD_Assets.HUD_Color.hud_shield_white'
+    WeightIconColor=Texture2D'KFClassicHUD_Assets.HUD_Color.hud_weight_white'
+    GrenadesIconColor=Texture2D'KFClassicHUD_Assets.HUD_Color.hud_grenade_white'
+    DoshIconColor=Texture2D'KFClassicHUD_Assets.HUD_Color.hud_pound_symbol_white'
+    BulletsIconColor=Texture2D'KFClassicHUD_Assets.HUD_Color.hud_bullets_white'
+    ClipsIconColor=Texture2D'KFClassicHUD_Assets.HUD_Color.hud_ammo_clip_white'
+    BurstBulletIconColor=Texture2D'KFClassicHUD_Assets.HUD_Color.hud_burst_bullet_white'
+    AutoTargetIconColor=Texture2D'KFClassicHUD_Assets.HUD_Color.hud_autotarget_white'
+    
+    ArrowIconColor=Texture2D'KFClassicHUD_Assets.HUD_Color.hud_arrowhead_white'
+    FlameIconColor=Texture2D'KFClassicHUD_Assets.HUD_Color.hud_flame_white'
+    FlameTankIconColor=Texture2D'KFClassicHUD_Assets.HUD_Color.hud_flame_tank_white'
+    FlashlightIconColor=Texture2D'KFClassicHUD_Assets.HUD_Color.hud_flashlight_white'
+    FlashlightOffIconColor=Texture2D'KFClassicHUD_Assets.HUD_Color.hud_flashlight_off_white'
+    RocketIconColor=Texture2D'KFClassicHUD_Assets.HUD_Color.hud_law_rocket_white'
+    BoltIconColor=Texture2D'KFClassicHUD_Assets.HUD_Color.hud_lightning_bolt_white'
+    M79IconColor=Texture2D'KFClassicHUD_Assets.HUD_Color.hud_m79_white'
+    PipebombIconColor=Texture2D'KFClassicHUD_Assets.HUD_Color.hud_pipebomb_white'
+    SingleBulletIconColor=Texture2D'KFClassicHUD_Assets.HUD_Color.hud_single_bullet_white'
+    SyringIconColor=Texture2D'KFClassicHUD_Assets.HUD_Color.hud_syringe_white'
+    SawbladeIconColor=Texture2D'KFClassicHUD_Assets.HUD_Color.texture_hud_sawblade_white'
+    ManualTargetIconColor=Texture2D'KFClassicHUD_Assets.HUD_Color.Hud_ManualTarget_White'
+    
+    WaveCircleColor=Texture2D'KFClassicHUD_Assets.HUD_Color.hud_bio_circle_white'
+    BioCircleColor=Texture2D'KFClassicHUD_Assets.HUD_Color.hud_bio_clock_circle_white'
+    
+    DoorWelderBG=Texture2D'KFClassicHUD_Assets.HUD.hud_box_128x64'
+    DoorWelderIcon=Texture2D'KFClassicHUD_Assets.HUD.Welder'
+    DoorWelderIconColor=Texture2D'KFClassicHUD_Assets.HUD_Color.welder_white'
 }

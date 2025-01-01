@@ -87,9 +87,19 @@ function TickHud(float DeltaTime)
 			KeyboardWeaponSelectWidget.SetDisplayInfo(DI);
 		}
 	}
+    
+    if( WaveInfoWidget != None && WaveInfoWidget.ObjectiveContainer != None )
+    {
+        DI = WaveInfoWidget.ObjectiveContainer.GetDisplayInfo();
+        if( DI.Visible )
+        {
+            DI.Visible = false;
+            WaveInfoWidget.ObjectiveContainer.SetDisplayInfo(DI);
+        }
+    }
 }
 
-function DisplayPriorityMessage(string InPrimaryMessageString, string InSecondaryMessageString, int LifeTime, optional KFLocalMessage_Priority.EGameMessageType MessageType)
+function DisplayPriorityMessage(string InPrimaryMessageString, string InSecondaryMessageString, int Lifetime, optional KFLocalMessage_Priority.EGameMessageType MessageType, optional string SpecialIconPath)
 {
     local KFGameReplicationInfo KFGRI;
     local int ModifierIndex;
